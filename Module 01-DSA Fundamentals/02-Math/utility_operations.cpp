@@ -6,14 +6,26 @@ using namespace std;
 
 /** Fast exponentiation algorithm */
 long long power(int base, int exp) {
-    long long result = 1, b = base;
+    long long result = 1; // Initialize result to 1 (as anything to the power 0 is 1)
+    long long b = base;   // Copy base to a long long variable to handle large values
+
+    // Loop until the exponent becomes 0
     while (exp > 0) {
-        if (exp % 2 == 1) result *= b;
+        // If the current exponent is odd, multiply result by the current base
+        if (exp % 2 == 1)
+            result *= b;
+
+        // Square the base for the next iteration
         b *= b;
+
+        // Divide the exponent by 2 (equivalent to right shift in binary)
         exp /= 2;
     }
+
+    // Return the final computed result
     return result;
 }
+
 
 /** Check if a number is perfect square */
 bool isPerfectSquare(int n) {

@@ -43,7 +43,7 @@ int lcmMultiple(vector<int> numbers) {
 int main() {
     cout << "=== GCD AND LCM OPERATIONS ===\n";
     int a = 48, b = 18;
-    cout << "GCD of " << a << " and " << b << ": " << gcd(a, b) << endl;
+    cout << "GCD of " << a << " and " << b << ": " << gcd(b, a) << endl;
     cout << "LCM of " << a << " and " << b << ": " << lcm(a, b) << endl;
     vector<int> numbers = {12, 18, 24};
     cout << "GCD of {12, 18, 24}: " << gcdMultiple(numbers) << endl;

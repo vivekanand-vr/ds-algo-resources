@@ -7,8 +7,10 @@ int findMaxConsecutiveOnes(vector<int>& arr) {
     for (int num : arr) {
         if (num == 1) {
             curr++;
+            // Increment count and update maximum
             mx = max(mx, curr);
         } else {
+            // Reset the counter
             curr = 0;
         }
     }

@@ -2,6 +2,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an array find the second largest element without sorting
+
 int getSecondLargest(vector<int> &arr) {
     int mx = INT_MIN;       
     int sec = INT_MIN;

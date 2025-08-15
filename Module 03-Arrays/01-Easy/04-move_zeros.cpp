@@ -2,6 +2,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an integer array nums, move all 0's to the end of it while maintaining the relative order
+
 void moveZeroes(vector<int>& arr) {
     int ind = 0;
     int n = arr.size();

@@ -2,6 +2,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given two sorted arrays a[] and b[], where each array may contain duplicate elements, 
+// the task is to return the elements in the union of the two arrays in sorted order.
+
 vector<int> findUnion(vector<int>& a, vector<int>& b) {
     int i = 0, j = 0;
     int n = a.size(), m = b.size();

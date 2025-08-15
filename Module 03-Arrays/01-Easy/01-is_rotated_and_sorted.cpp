@@ -2,6 +2,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Check if the given array is sorted
 
 bool check(vector<int>& arr) {
     int point = -1;

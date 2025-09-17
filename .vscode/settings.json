@@ -1,0 +1,19 @@
+{
+  // Use clang-format for C++
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+
+  // Format on save
+  "editor.formatOnSave": true,
+  "editor.formatOnType": true,
+
+  // Optional: enforce a style (LLVM, Google, Chromium, Microsoft, Mozilla, WebKit, or file)
+  "C_Cpp.clang_format_fallbackStyle": "Google",
+
+  // If you have a .clang-format file in your project, it will override the fallback
+  "C_Cpp.clang_format_style": "file"
+}

@@ -35,19 +35,14 @@ class Solution {
 
 int main() {
   vector<int> nums = {1, 1, 2, 2, 3, 3, 4};
-
   Solution obj;
 
   int k = obj.removeDuplicates(nums);
-
   cout << "Number of unique elements: " << k << endl;
-
   cout << "Array after removing duplicates: ";
-
   for (int i = 0; i < k; ++i) {
     cout << nums[i] << " ";
   }
-
   cout << endl;
 
   return 0;

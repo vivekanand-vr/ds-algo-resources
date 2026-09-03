@@ -2,6 +2,27 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an m x n matrix, if an element is 0, set its entire row and column to 0, in-place
+
+/*
+    Approach: Use First Row & Column as Markers
+    - Use the first row & column as marker arrays to avoid extra space
+    - First pass: if arr[i][j] == 0, mark arr[i][0] and arr[0][j]
+      (special case: track first row separately with a rowZero flag)
+    - Second pass: set arr[i][j] = 0 if its row or column was marked
+    - Handle the first column and first row at the end using the markers/flag
+
+    Algorithm Steps
+    ----------------
+    1. Traverse the matrix; if arr[i][j] == 0, mark arr[i][0] and arr[0][j]
+       (use rowZero flag instead of arr[0][0] for the first row)
+    2. For rows 1..n-1 and cols 1..m-1, set arr[i][j] = 0 if arr[i][0] == 0 or arr[0][j] == 0
+    3. If arr[0][0] == 0, zero out the entire first column
+    4. If rowZero == 0, zero out the entire first row
+
+    Time Complexity: O(n * m) - two passes through the matrix
+    Space Complexity: O(1) - in-place (only uses rowZero flag)
+*/
 void setZeroes(vector<vector<int>>& arr) {
     int n = arr.size(), m = arr[0].size();
     int rowZero = 1;   // flag to track if the first row needs to be zeroed
@@ -48,15 +69,26 @@ void setZeroes(vector<vector<int>>& arr) {
     }
 }
 
-/*
-Logic:
-------
-1. Use the first row & column as marker arrays to avoid extra space.
-2. First pass: if arr[i][j] == 0 → mark arr[i][0] and arr[0][j].
-   - Special case: track first row separately with rowZero flag.
-3. Second pass: set arr[i][j] = 0 if row or col was marked.
-4. Handle first column and first row at the end.
+int main() {
+    vector<vector<int>> arr = {
+        {1, 1, 1},
+        {1, 0, 1},
+        {1, 1, 1}
+    };
 
-Time Complexity:  O(n * m) → two passes through the matrix
-Space Complexity: O(1) → in-place (only uses rowZero flag)
-*/
+    cout << "Matrix before:" << endl;
+    for (auto& row : arr) {
+        for (int x : row) cout << x << " ";
+        cout << endl;
+    }
+
+    setZeroes(arr);
+
+    cout << "Matrix after:" << endl;
+    for (auto& row : arr) {
+        for (int x : row) cout << x << " ";
+        cout << endl;
+    }
+
+    return 0;
+}

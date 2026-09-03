@@ -2,6 +2,31 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Count the number of inversions in an array, i.e. pairs (i, j) such that
+// i < j and arr[i] > arr[j]
+
+/*
+    Approach: Modified Merge Sort (Divide & Conquer)
+    - Count inversions while performing a merge sort, avoiding the O(n^2)
+      brute-force pair check
+    - Recursively count inversions in the left half and the right half
+    - While merging the two sorted halves, whenever an element from the right
+      half is placed before a remaining element from the left half, every
+      remaining element in the left half forms an inversion with it
+    - Sum inversions from the left half, right half, and the merge step
+
+    Algorithm Steps
+    ----------------
+    1. Recursively split the array into halves until subarrays of size 1
+    2. Count inversions in the left half and the right half recursively
+    3. Merge the two sorted halves; each time a right-half element is placed
+       before a left-half element, add the count of remaining left elements
+    4. Sum all three inversion counts and return the total
+
+    Time Complexity: O(n log n) - standard merge sort recurrence
+    Space Complexity: O(n) - temporary arrays used during merging
+*/
+
 // Helper function to merge two sorted halves and count inversions
 long long mergeAndCount(vector<int>& arr, int l, int m, int r) {
     vector<int> left(arr.begin() + l, arr.begin() + m + 1);
@@ -45,13 +70,14 @@ int inversionCount(vector<int> &arr) {
     return (int) mergeSortCount(arr, 0, arr.size() - 1);
 }
 
-/*
-Logic:
-- Use merge sort to divide array into halves.
-- While merging, if left[i] > right[j], then all elements from left[i..end] 
-  form inversions with right[j].
-- Count them efficiently instead of checking all pairs.
+int main() {
+    vector<int> arr = {2, 4, 1, 3, 5};
 
-Time Complexity:  O(n log n) → merge sort
-Space Complexity: O(n)       → temp arrays for merging
-*/
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    cout << "Inversion count: " << inversionCount(arr) << endl;
+
+    return 0;
+}

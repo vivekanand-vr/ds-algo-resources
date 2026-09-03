@@ -4,6 +4,25 @@ using namespace std;
 
 // Q: Given an array find the second largest element without sorting
 
+/*
+    Approach: Single Pass Tracking
+    - Maintain two variables: largest (mx) and second largest (sec)
+    - While scanning, whenever a new largest is found, the old largest becomes
+      the second largest
+    - Otherwise, if the current element is not equal to the largest but greater
+      than the current second largest, update the second largest
+
+    Algorithm Steps
+    ----------------
+    1. Initialize mx and sec to INT_MIN
+    2. Traverse the array once
+    3. If arr[i] > mx, shift mx into sec, then update mx
+    4. Else if arr[i] > sec and arr[i] != mx, update sec
+    5. Return sec (or -1 if no valid second largest exists)
+
+    Time Complexity: O(n)
+    Space Complexity: O(1)
+*/
 int getSecondLargest(vector<int> &arr) {
     int mx = INT_MIN;       
     int sec = INT_MIN;
@@ -27,5 +46,13 @@ int getSecondLargest(vector<int> &arr) {
     return sec;
 }
 
-// Time Complexity: O(n)
-// Space Complexity: O(1)
+int main() {
+    vector<int> arr = {8, 8, 7, 6, 5};
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    cout << "Second largest element: " << getSecondLargest(arr) << endl;
+
+    return 0;
+}

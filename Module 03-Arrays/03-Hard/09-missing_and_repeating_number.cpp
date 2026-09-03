@@ -2,6 +2,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an array of size n containing numbers from 1 to n where one number
+// is missing and another is repeated twice, find the repeating and missing numbers
+
+/*
+    Approach: Sum and Sum of Squares Equations
+    - The array should ideally contain each of 1..n exactly once
+    - Let x be the repeating number and y be the missing number
+    - Comparing the actual sum to the expected sum S gives (x - y)
+    - Comparing the actual sum of squares to the expected sum of squares P
+      gives (x^2 - y^2) = (x - y)(x + y), which combined with (x - y) yields (x + y)
+    - Solve the resulting 2-equation system for x and y
+
+    Algorithm Steps
+    ----------------
+    1. Compute expected sum S and expected sum of squares P for 1..n
+    2. Compute actual sum and actual sum of squares from the array
+    3. diff1 = actual sum - S gives (x - y)
+    4. diff2 = actual sumSq - P gives (x - y)(x + y); divide by diff1 to get (x + y)
+    5. Solve: x = (diff1 + sumXY) / 2, y = x - diff1
+    6. Return {x, y}
+
+    Time Complexity: O(n) - one traversal to calculate sums
+    Space Complexity: O(1) - constant extra space
+*/
 vector<int> findTwoElement(vector<int>& arr) {
     int n = arr.size();
     
@@ -37,13 +61,17 @@ vector<int> findTwoElement(vector<int>& arr) {
     return {(int)x, (int)y};
 }
 
-/*
-Logic:
-- The array should contain numbers 1..n.
-- Use difference between expected sum & actual sum to get (x - y).
-- Use difference between expected squares & actual squares to get (x^2 - y^2).
-- Solve the two equations to find x (repeated) and y (missing).
+int main() {
+    vector<int> arr = {3, 1, 2, 5, 3};
 
-Time Complexity:  O(n)  → one traversal to calculate sums
-Space Complexity: O(1)  → constant space
-*/
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    vector<int> result = findTwoElement(arr);
+
+    cout << "Repeating number: " << result[0] << endl;
+    cout << "Missing number: " << result[1] << endl;
+
+    return 0;
+}

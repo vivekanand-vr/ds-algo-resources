@@ -2,6 +2,23 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an array of size n, find the majority element (appears more than n/2 times)
+
+/*
+    Approach: Boyer-Moore Voting Algorithm
+    - Keeps track of a candidate and a counter representing its "balance"
+    - Majority element (appears > n/2 times) is guaranteed to survive the cancellation
+
+    Algorithm Steps
+    ----------------
+    1. Initialize counter c = 0 and candidate curr = nums[0]
+    2. Traverse the array; if c == 0, set curr to the current element
+    3. Increment c if current element matches curr, else decrement c
+    4. Return curr as the majority element
+
+    Time Complexity: O(n) - single pass over the array
+    Space Complexity: O(1) - uses only a couple of variables
+*/
 int majorityElement(vector<int>& nums) {
     int n = (int) nums.size();
     int c = 0;             // counter for tracking "balance" of candidate
@@ -21,15 +38,14 @@ int majorityElement(vector<int>& nums) {
     return curr;
 }
 
-/*
-Algorithm: Boyer-Moore Voting Algorithm
----------------------------------------
-- Keeps track of a candidate and a counter.
-- Majority element (appears > n/2 times) is guaranteed to survive.
+int main() {
+    vector<int> nums = {2, 2, 1, 1, 1, 2, 2};
 
-Time Complexity:
-O(n) → single pass over the array.
+    cout << "Array: ";
+    for (int x : nums) cout << x << " ";
+    cout << endl;
 
-Space Complexity:
-O(1) → uses only a couple of variables.
-*/
+    cout << "Majority element: " << majorityElement(nums) << endl;
+
+    return 0;
+}

@@ -4,6 +4,26 @@ using namespace std;
 
 // Q: Find the length of the longest subarray whose sum equals k (array may contain negative numbers)
 
+/*
+    Approach: Prefix Sum + Hash Map
+    - Maintain a running prefix sum while scanning the array
+    - If the prefix sum itself equals k, the subarray from index 0 is a candidate
+    - If (prefixSum - k) was seen before at some index p, the subarray between
+      p+1 and the current index sums to exactly k
+    - Store only the FIRST occurrence of each prefix sum, since an earlier
+      occurrence gives a longer subarray
+
+    Algorithm Steps
+    ----------------
+    1. Traverse the array, updating a running prefix sum
+    2. If sum == k, update maxLen with i + 1
+    3. If (sum - k) exists in the map, update maxLen with i - prefixIndex[sum - k]
+    4. Record the first occurrence of each prefix sum
+    5. Return maxLen
+
+    Time Complexity: O(n) - single pass through array, O(1) avg for hash map ops
+    Space Complexity: O(n) - storing prefix sums in hash map
+*/
 int longestSubarray(vector<int>& arr, int k) {
     unordered_map<int, int> prefixIndex; // stores first occurrence of each prefix sum
     int sum = 0, maxLen = 0;
@@ -32,6 +52,15 @@ int longestSubarray(vector<int>& arr, int k) {
     return maxLen;
 }
 
-// Time Complexity: O(n) — single pass through array, O(1) avg for hash map ops
-// Space Complexity: O(n) — storing prefix sums in hash map
+int main() {
+    vector<int> arr = {10, 5, 2, 7, 1, -10};
+    int k = 15;
 
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    cout << "Longest subarray with sum " << k << ": " << longestSubarray(arr, k) << endl;
+
+    return 0;
+}

@@ -2,6 +2,25 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Find all leader elements in the array, i.e., elements greater than or equal to
+// all elements to their right
+
+/*
+    Approach: Right-to-Left Scan with Running Maximum
+    - Traverse the array from right to left while tracking the maximum seen so far
+    - An element is a leader if it is greater than or equal to this running maximum
+    - Collect leaders while scanning, then reverse to restore original order
+
+    Algorithm Steps
+    ----------------
+    1. Initialize h with the last element of the array
+    2. Traverse from the last index down to the first
+    3. Update h = max(h, arr[i]); if arr[i] >= h, add arr[i] to the result
+    4. Reverse the result to restore left-to-right order and return it
+
+    Time Complexity: O(n) - single pass through array + reverse
+    Space Complexity: O(n) - to store leaders
+*/
 vector<int> leaders(vector<int>& arr) {
     int n = arr.size();
     int h = arr[n - 1];      // keep track of maximum seen so far (from right side)
@@ -24,7 +43,18 @@ vector<int> leaders(vector<int>& arr) {
 }
 
 
-/*
-Time Complexity:  O(n) → single pass through array + reverse
-Space Complexity: O(n) → to store leaders
-*/
+int main() {
+    vector<int> arr = {10, 22, 12, 3, 0, 6};
+
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    vector<int> res = leaders(arr);
+
+    cout << "Leaders: ";
+    for (int x : res) cout << x << " ";
+    cout << endl;
+
+    return 0;
+}

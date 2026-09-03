@@ -2,6 +2,23 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Given an array with only 0s, 1s, and 2s, sort it in-place (Dutch National Flag problem)
+
+/*
+    Approach: Counting
+    - Count the number of 0s, 1s, and 2s present in the array
+    - Overwrite the array by filling in that many 0s, then 1s, then 2s
+
+    Algorithm Steps
+    ----------------
+    1. Traverse the array once and count occurrences of 0, 1, and 2
+    2. Overwrite the first 'z' positions with 0
+    3. Overwrite the next 'o' positions with 1
+    4. Overwrite the remaining 't' positions with 2
+
+    Time Complexity: O(n) - first pass to count, second pass to overwrite
+    Space Complexity: O(1) - only uses a few integer variables
+*/
 void sortColors(vector<int>& arr) {
     int z = 0, o = 0, t = 0;  
 
@@ -23,10 +40,18 @@ void sortColors(vector<int>& arr) {
     for (int i = 0; i < t; ++i) arr[i + z + o] = 2;   // fill 2s after 1s
 }
 
-/*
-Time Complexity:
-O(n) → First pass to count, second pass to overwrite elements.
+int main() {
+    vector<int> arr = {2, 0, 2, 1, 1, 0};
 
-Space Complexity:
-O(1) → Only uses a few integer variables (z, o, t), no extra data structures.
-*/
+    cout << "Array: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    sortColors(arr);
+
+    cout << "Sorted colors: ";
+    for (int x : arr) cout << x << " ";
+    cout << endl;
+
+    return 0;
+}

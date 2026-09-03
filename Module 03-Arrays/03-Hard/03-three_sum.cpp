@@ -2,6 +2,29 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Find all unique triplets in the array that sum up to zero
+
+/*
+    Approach: Sort + Two Pointers
+    - Sort the array so duplicates sit next to each other and two-pointer
+      scanning becomes possible
+    - Fix the first element of the triplet, then use two pointers (left/right)
+      on the remaining subarray to find pairs summing to -nums[i]
+    - Skip over duplicate values for all three positions to avoid duplicate
+      triplets in the result
+
+    Algorithm Steps
+    ----------------
+    1. Sort nums in ascending order
+    2. For each index i, skip if it duplicates the previous fixed element
+    3. Set l = i+1, r = n-1 and move pointers based on the triplet sum
+    4. If sum == 0, record the triplet and skip duplicates for l and r
+    5. If sum < 0, move l right; if sum > 0, move r left
+    6. Return all collected triplets
+
+    Time Complexity: O(n^2) - sorting O(n log n) plus O(n) two-pointer scan for each of n fixed elements
+    Space Complexity: O(1) - excluding the space used for the output
+*/
 vector<vector<int>> threeSum(vector<int>& nums) {
     vector<vector<int>> res;
     int n = nums.size();
@@ -44,15 +67,20 @@ vector<vector<int>> threeSum(vector<int>& nums) {
     return res;
 }
 
+int main() {
+    vector<int> nums = {-1, 0, 1, 2, -1, -4};
 
-/*
-Efficient 3Sum approach (sorting + two-pointer)
------------------------------------------------
-Time Complexity:  
-- Sorting → O(n log n)  
-- Outer loop runs n times, and inside we use a two-pointer scan (O(n))  
-- So total = O(n^2)
+    cout << "Array: ";
+    for (int x : nums) cout << x << " ";
+    cout << endl;
 
-Space Complexity:  
-- O(1) extra (ignoring result storage)  
-*/
+    vector<vector<int>> result = threeSum(nums);
+
+    cout << "Triplets that sum to zero:" << endl;
+    for (auto& triplet : result) {
+        for (int x : triplet) cout << x << " ";
+        cout << endl;
+    }
+
+    return 0;
+}

@@ -2,6 +2,27 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// Q: Find all elements in the array that appear more than n/3 times
+
+/*
+    Approach: Boyer-Moore Voting (Extended to 2 Candidates)
+    - At most 2 elements can appear more than n/3 times
+    - Phase 1: maintain 2 candidates with counters, similar to standard
+      Boyer-Moore voting, to narrow down to at most 2 potential candidates
+    - Phase 2: recount the actual occurrences of both candidates in the array
+    - Phase 3: keep only the candidates whose count truly exceeds n/3
+
+    Algorithm Steps
+    ----------------
+    1. Traverse nums, updating cand1/cand2 and their counters using voting rules
+    2. Reset counters and recount actual occurrences of cand1 and cand2
+    3. Add cand1 to result if its count > n/3
+    4. Add cand2 to result if its count > n/3
+    5. Return the result
+
+    Time Complexity: O(n) - two linear passes over the array
+    Space Complexity: O(1) - only a few counters and candidate variables
+*/
 vector<int> majorityElement(vector<int>& nums) {
     int n = nums.size();
 
@@ -40,14 +61,18 @@ vector<int> majorityElement(vector<int>& nums) {
     return res;
 }
 
-/*
-Logic:
-------
-- At most 2 majority elements (> n/3).
-- Step 1: Voting phase → find up to 2 candidates.
-- Step 2: Count occurrences of candidates.
-- Step 3: Return those with frequency > n/3.
+int main() {
+    vector<int> nums = {3, 2, 3};
 
-Time Complexity:  O(n) → two passes
-Space Complexity: O(1) → only counters & candidates
-*/
+    cout << "Array: ";
+    for (int x : nums) cout << x << " ";
+    cout << endl;
+
+    vector<int> result = majorityElement(nums);
+
+    cout << "Elements appearing more than n/3 times: ";
+    for (int x : result) cout << x << " ";
+    cout << endl;
+
+    return 0;
+}

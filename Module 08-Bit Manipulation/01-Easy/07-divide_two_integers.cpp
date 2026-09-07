@@ -43,7 +43,7 @@ using namespace std;
     Space Complexity: O(1) - only a few accumulator variables are used
 */
 int divide(int dividend, int divisor) {
-  if (dividend == INT_MIN && divisor == -1) return INT_MAX;   // overflow guard
+  if (dividend == INT_MIN && divisor == -1) return INT_MAX;  // overflow guard
 
   bool negative = (dividend < 0) ^ (divisor < 0);
 
@@ -66,14 +66,16 @@ int divide(int dividend, int divisor) {
 
 int main() {
   int dividend = 43, divisor = 5;
-  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor) << endl;
+  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor)
+       << endl;
 
   dividend = -43, divisor = 5;
-  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor) << endl;
+  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor)
+       << endl;
 
   dividend = INT_MIN, divisor = -1;
-  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor) << endl;
+  cout << dividend << " / " << divisor << " = " << divide(dividend, divisor)
+       << endl;
 
   return 0;
 }
- }

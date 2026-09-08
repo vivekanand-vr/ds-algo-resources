@@ -9,6 +9,17 @@ using namespace std;
 // Example:
 // nums = {1, 2, 3}
 // Subsets: {}, {1}, {2}, {1,2}, {3}, {1,3}, {2,3}, {1,2,3}
+//
+// Bitmask walkthrough (n = 3, bit i <-> nums[i], bit0 = LSB = nums[0]):
+//   mask   binary (b2 b1 b0)   included elements        subset
+//    0        0  0  0         (none)                    {}
+//    1        0  0  1         nums[0]=1                 {1}
+//    2        0  1  0         nums[1]=2                 {2}
+//    3        0  1  1         nums[0], nums[1]          {1,2}
+//    4        1  0  0         nums[2]=3                 {3}
+//    5        1  0  1         nums[0], nums[2]          {1,3}
+//    6        1  1  0         nums[1], nums[2]          {2,3}
+//    7        1  1  1         nums[0], nums[1], nums[2] {1,2,3}
 
 /*
     Approach: Bitmask Enumeration

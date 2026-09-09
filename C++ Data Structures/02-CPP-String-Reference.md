@@ -38,7 +38,7 @@ string s = "cat";
              capacity() >= 3
 ```
 
-Because it behaves like a vector under the hood, almost every vector idiom (two pointers, reserve, erase-remove, iterator ranges) transfers directly - see [../../Module 03-Arrays/notes/06-CPP-Vector-Reference.md](../../Module%2003-Arrays/notes/06-CPP-Vector-Reference.md).
+Because it behaves like a vector under the hood, almost every vector idiom (two pointers, reserve, erase-remove, iterator ranges) transfers directly - see [01-CPP-Vector-Reference.md](01-CPP-Vector-Reference.md).
 
 ---
 
@@ -147,7 +147,7 @@ s.assign(3, 'z');              // "zzz"
 Repeatedly **prepending** (`s = c + s;`) is O(n) per operation because it must shift every existing character - O(n^2) over n prepends. Appending (`s += c;` / `push_back`) is amortised O(1). When a result must be built in reverse order, either:
 
 - append normally and call `reverse(s.begin(), s.end())` once at the end (O(n) total), or
-- figure out the natural iteration order that lets you append directly (e.g. scanning the source right-to-left) so no reversal is needed at all - see [02-reverse_words.cpp](../01-Basic/02-reverse_words.cpp).
+- figure out the natural iteration order that lets you append directly (e.g. scanning the source right-to-left) so no reversal is needed at all - see [02-reverse_words.cpp](../Module%2005-Strings/01-Basic/02-reverse_words.cpp).
 
 ---
 
@@ -183,7 +183,7 @@ bool isRotation = (s.length() == goal.length()) &&
                    (goal + goal).find(s) != string::npos;
 ```
 
-→ [06-rotate_string.cpp](../01-Basic/06-rotate_string.cpp)
+→ [06-rotate_string.cpp](../Module%2005-Strings/01-Basic/06-rotate_string.cpp)
 
 ---
 
@@ -292,7 +292,7 @@ string token;
 while (getline(iss2, token, ',')) tokens.push_back(token);  // keeps empty tokens
 ```
 
-Prefer the manual-loop version in interview code when the point of the exercise is the parsing itself (e.g. "reverse the words") - see [02-reverse_words.cpp](../01-Basic/02-reverse_words.cpp), which scans right-to-left by hand instead of relying on `istringstream`.
+Prefer the manual-loop version in interview code when the point of the exercise is the parsing itself (e.g. "reverse the words") - see [02-reverse_words.cpp](../Module%2005-Strings/01-Basic/02-reverse_words.cpp), which scans right-to-left by hand instead of relying on `istringstream`.
 
 ---
 
@@ -322,7 +322,7 @@ bool isAnagramSort(string s, string t) {
 }
 ```
 
-→ compare with the O(n) frequency-array version in [07-valid_angram.cpp](../01-Basic/07-valid_angram.cpp) - sorting is the simpler-but-slower alternative worth knowing.
+→ compare with the O(n) frequency-array version in [07-valid_angram.cpp](../Module%2005-Strings/01-Basic/07-valid_angram.cpp) - sorting is the simpler-but-slower alternative worth knowing.
 
 ---
 
@@ -350,7 +350,7 @@ toupper(c)   tolower(c)               // return the converted char (as int)
 | `unordered_map<char,int>` | O(1) avg | — | — | hash | frequency counts over a larger alphabet (Unicode-ish) |
 | `array<int,26>` / `vector<int>(26)` | O(1) | — | — | stack/contiguous | frequency counts over `a-z` - faster than a map |
 
-For lowercase-only alphabet problems, a fixed `int freq[26]` (or `[256]` for any byte) beats `unordered_map<char,int>` - no hashing, no allocation, guaranteed O(1). See [05-isomorphic_strings.cpp](../01-Basic/05-isomorphic_strings.cpp) and [07-valid_angram.cpp](../01-Basic/07-valid_angram.cpp).
+For lowercase-only alphabet problems, a fixed `int freq[26]` (or `[256]` for any byte) beats `unordered_map<char,int>` - no hashing, no allocation, guaranteed O(1). See [05-isomorphic_strings.cpp](../Module%2005-Strings/01-Basic/05-isomorphic_strings.cpp) and [07-valid_angram.cpp](../Module%2005-Strings/01-Basic/07-valid_angram.cpp).
 
 ---
 
@@ -460,5 +460,6 @@ for (int i = 0; i < n; i++) {
 
 ## Related Notes
 
-- [../../Module 03-Arrays/notes/06-CPP-Vector-Reference.md](../../Module%2003-Arrays/notes/06-CPP-Vector-Reference.md) - `std::string` shares most of `vector`'s member-function shape and pitfalls
-- [../../Module 03-Arrays/notes/04-Two-Pointers.md](../../Module%2003-Arrays/notes/04-Two-Pointers.md) - the two-pointer patterns here (palindrome check, in-place reverse) apply directly to strings
+- [01-CPP-Vector-Reference.md](01-CPP-Vector-Reference.md) - `std::string` shares most of `vector`'s member-function shape and pitfalls
+- [03-CPP-Map-Reference.md](03-CPP-Map-Reference.md) - `map` / `unordered_map` / `set` reference
+- [../Module%2003-Arrays/notes/04-Two-Pointers.md](../Module%2003-Arrays/notes/04-Two-Pointers.md) - the two-pointer patterns here (palindrome check, in-place reverse) apply directly to strings

@@ -9,7 +9,7 @@ Theory notes for the recurring techniques behind the problems in [Module 03-Arra
 | 03 | [Kadane's Algorithm](03-Kadanes-Algorithm.md) | maximum subarray, correctness, variants, max product |
 | 04 | [Two Pointers & Sliding Window](04-Two-Pointers.md) | the four pointer shapes, window templates, Dutch National Flag |
 | 05 | [Boyer–Moore Voting](05-Boyer-Moore-Voting.md) | majority > n/2, the n/3 variant, the general n/k case |
-| 06 | [C++ `std::vector` Reference](06-CPP-Vector-Reference.md) | member functions, STL algorithms, comparators, complexities, pitfalls |
+| — | [C++ `std::vector` Reference](../../C%2B%2B%20Data%20Structures/01-CPP-Vector-Reference.md) | member functions, STL algorithms, comparators, complexities, pitfalls (moved to [C++ Data Structures/](../../C%2B%2B%20Data%20Structures/)) |
 
 ---
 
@@ -69,7 +69,7 @@ Element occurring more than n/2 or n/3 times, O(1) space?
 | [08 Max sum of 2 min elements](../02-Medium/08-max_sum_2_min_elements.cpp) | Adjacent pair scan |
 | [09 Leaders in an array](../02-Medium/09-leaders.cpp) | Suffix maximum — [Prefix Sum](02-Prefix-Sum.md) §7 |
 | [10 Longest consecutive sequence](../02-Medium/10-longest_consecutive.cpp) | Hash set |
-| [11 Set matrix zeroes](../02-Medium/11-set_zeros.cpp) | In-place markers — [Vectors](06-CPP-Vector-Reference.md) §9 |
+| [11 Set matrix zeroes](../02-Medium/11-set_zeros.cpp) | In-place markers — [Vectors](../../C%2B%2B%20Data%20Structures/01-CPP-Vector-Reference.md) §9 |
 | [12 Rotate matrix](../02-Medium/12-rotate.cpp) | Transpose + reverse rows |
 | [13 Spiral order](../02-Medium/13-spiral_order.cpp) | Four boundary pointers |
 | [14 Count subarrays with sum k](../02-Medium/14-subarray_sum.cpp) | [Prefix Sum](02-Prefix-Sum.md) + hash map |
@@ -78,7 +78,7 @@ Element occurring more than n/2 or n/3 times, O(1) space?
 
 | Problem | Technique |
 | --- | --- |
-| [01 Pascal's triangle](../03-Hard/01-pascals_triangle.cpp) | Row-by-row build — [Vectors](06-CPP-Vector-Reference.md) §9 |
+| [01 Pascal's triangle](../03-Hard/01-pascals_triangle.cpp) | Row-by-row build — [Vectors](../../C%2B%2B%20Data%20Structures/01-CPP-Vector-Reference.md) §9 |
 | [02 Majority element II](../03-Hard/02-majority_element_II.cpp) | [Boyer–Moore](05-Boyer-Moore-Voting.md) with 2 candidates |
 | [03 Three sum](../03-Hard/03-three_sum.cpp) | Sort + [Two Pointers](04-Two-Pointers.md) |
 | [04 Four sum](../03-Hard/04-four_sum.cpp) | Sort + [Two Pointers](04-Two-Pointers.md) |

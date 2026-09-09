@@ -579,8 +579,10 @@ for (size_t i = 0; i < v.size(); i++) cout << v[i] << " \n"[i + 1 == v.size()];
 
 ## Related Notes
 
-- [01-Subarrays.md](01-Subarrays.md) — what a subarray is and how to scan them
-- [02-Prefix-Sum.md](02-Prefix-Sum.md) — range sums and the hash-map pattern
-- [03-Kadanes-Algorithm.md](03-Kadanes-Algorithm.md) — maximum subarray in O(n)
-- [04-Two-Pointers.md](04-Two-Pointers.md) — windows, converging pointers, in-place compaction
-- [05-Boyer-Moore-Voting.md](05-Boyer-Moore-Voting.md) — majority elements in O(1) space
+- [02-CPP-String-Reference.md](02-CPP-String-Reference.md) — `std::string` shares most of `vector`'s member-function shape and pitfalls
+- [03-CPP-Map-Reference.md](03-CPP-Map-Reference.md) — `map` / `unordered_map` / `set` reference
+- [../Module%2003-Arrays/notes/01-Subarrays.md](../Module%2003-Arrays/notes/01-Subarrays.md) — what a subarray is and how to scan them
+- [../Module%2003-Arrays/notes/02-Prefix-Sum.md](../Module%2003-Arrays/notes/02-Prefix-Sum.md) — range sums and the hash-map pattern
+- [../Module%2003-Arrays/notes/03-Kadanes-Algorithm.md](../Module%2003-Arrays/notes/03-Kadanes-Algorithm.md) — maximum subarray in O(n)
+- [../Module%2003-Arrays/notes/04-Two-Pointers.md](../Module%2003-Arrays/notes/04-Two-Pointers.md) — windows, converging pointers, in-place compaction
+- [../Module%2003-Arrays/notes/05-Boyer-Moore-Voting.md](../Module%2003-Arrays/notes/05-Boyer-Moore-Voting.md) — majority elements in O(1) space

@@ -73,9 +73,9 @@ int countSetBitsIn1ToN(int n) {
 
   int x = findLargestPowerOf2(n);
 
-  int bitsTillHighestPower = x * (1 << (x - 1));
-  int msbFromHighestPowerToN = n - (1 << x) + 1;
-  int remainingBits = countSetBitsIn1ToN(n - (1 << x));
+  int bitsTillHighestPower = x * (1 << (x - 1));          // x * (2^(x-1))
+  int msbFromHighestPowerToN = n - (1 << x) + 1;          // n = 2^x + 1
+  int remainingBits = countSetBitsIn1ToN(n - (1 << x));   // n - 2^x
 
   return bitsTillHighestPower + msbFromHighestPowerToN + remainingBits;
 }
@@ -98,3 +98,28 @@ int main() {
 
   return 0;
 }
+
+// Bit table walkthrough (n = 11):
+//
+//   number   binary   set bits
+//     1       0001        1
+//     2       0010        1
+//     3       0011        2
+//     4       0100        1
+//     5       0101        2
+//     6       0110        2
+//     7       0111        3
+//     8       1000        1
+//     9       1001        2
+//    10       1010        2
+//    11       1011        3
+//                        ----
+//                total =  20
+//
+// Recursive formula breakdown for n = 11 (largest power of 2, 2^x <= 11, is 2^3 = 8):
+//   1. bitsTill2x  = x * 2^(x-1) = 3 * 2^2         = 12   (bits set across [0, 7])
+//   2. msbFrom2xToN = n - 2^x + 1 = 11 - 8 + 1      =  4   (bit 3 set for 8,9,10,11)
+//   3. rest = countSetBitsIn1ToN(n - 2^x) = countSetBitsIn1ToN(3)
+//        -> for n = 3: x = 1, bitsTill2x = 1*2^0 = 1, msbFrom2xToN = 3-2+1 = 2,
+//           rest = countSetBitsIn1ToN(1) = 1  =>  total = 1 + 2 + 1 = 4
+//   total(11) = 12 + 4 + 4 = 20

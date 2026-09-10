@@ -123,3 +123,189 @@ int main() {
 //        -> for n = 3: x = 1, bitsTill2x = 1*2^0 = 1, msbFrom2xToN = 3-2+1 = 2,
 //           rest = countSetBitsIn1ToN(1) = 1  =>  total = 1 + 2 + 1 = 4
 //   total(11) = 12 + 4 + 4 = 20
+
+/*
+    ======================================================================
+    DRY RUN: n = 11   (answer = 20)
+    ======================================================================
+
+      n = 11    binary:  1 0 1 1
+                bit:     3 2 1 0
+                         ^
+                         highest set bit is bit 3, so 2^x = 8 and x = 3
+
+    The bit table above (before this block) shows WHAT the answer is by
+    adding up 11 rows. This block shows HOW the code gets there without
+    touching those rows at all: it peels off the highest set bit of n,
+    accounts for it in closed form, and recurses on the leftover
+    low bits. Peeling the bits of 1011 gives the call chain
+
+          f(11)  ->  f(3)  ->  f(1)  ->  f(0)
+          1011       0011      0001      0000
+           ^peel      ^peel     ^peel
+           bit 3      bit 1     bit 0
+
+    so the depth is the number of SET bits of n, at most log n calls.
+
+    Tracked state (per call):
+      x        - largest exponent with 2^x <= n, found by shifting
+      bitsTill - x * 2^(x-1), all set bits in the whole range [0, 2^x -1]
+      msbPart  - n - 2^x + 1, the count of numbers in [2^x, n], each of
+                 which carries the peeled MSB exactly once
+      rest     - recursive result for n - 2^x, the low bits of that same
+                 upper stretch
+
+    ----------------------------------------------------------------------
+    CALL f(11)
+      base case?   11 <= 0 ?  no
+
+      findLargestPowerOf2(11)   -- inner shift loop
+        x = 0:   n >> 1  =  0 1 0 1   ( 5) > 0  -> x = 1
+        x = 1:   n >> 2  =  0 0 1 0   ( 2) > 0  -> x = 2
+        x = 2:   n >> 3  =  0 0 0 1   ( 1) > 0  -> x = 3
+        x = 3:   n >> 4  =  0 0 0 0   ( 0) not > 0  -> stop
+        returns x = 3            (2^3 = 1 0 0 0 = 8 <= 11 < 16)
+
+      step 1  bitsTill = x * (1 << (x-1)) = 3 * (1 << 2) = 3 * 4 = 12
+              this is every set bit in 0000..0111, i.e. the numbers
+              0 through 7: three bit columns, each holding a 1 in
+              exactly half of the 8 numbers -> 3 * 4 = 12
+
+      step 2  msbPart = n - (1 << x) + 1 = 11 - 8 + 1 = 4
+              the four numbers 1000, 1001, 1010, 1011 (8..11) each carry
+              bit 3, and nothing else in [1, 11] does
+
+      step 3  rest = f(n - (1 << x)) = f(11 - 8) = f(3)
+              strip bit 3 off those same four numbers and what is left
+              is 000, 001, 010, 011 - exactly the range [0, 3]
+
+      (recursion suspends here, waiting on f(3))
+
+    ----------------------------------------------------------------------
+    CALL f(3)
+      base case?   3 <= 0 ?  no
+
+      findLargestPowerOf2(3)
+        x = 0:   n >> 1  =  0 0 0 1   ( 1) > 0  -> x = 1
+        x = 1:   n >> 2  =  0 0 0 0   ( 0) not > 0  -> stop
+        returns x = 1            (2^1 = 0 0 1 0 = 2 <= 3 < 4)
+
+      step 1  bitsTill = 1 * (1 << 0) = 1 * 1 = 1
+              set bits across 00..01 (the numbers 0 and 1): just one
+
+      step 2  msbPart = 3 - 2 + 1 = 2
+              the two numbers 10, 11 (2 and 3) each carry bit 1
+
+      step 3  rest = f(3 - 2) = f(1)
+
+    ----------------------------------------------------------------------
+    CALL f(1)
+      base case?   1 <= 0 ?  no
+
+      findLargestPowerOf2(1)
+        x = 0:   n >> 1  =  0 0 0 0   ( 0) not > 0  -> stop immediately
+        returns x = 0            (2^0 = 1 <= 1 < 2)
+
+      step 1  bitsTill = x * (1 << (x-1)) = 0 * (1 << -1)
+              x is 0 here, so the shift count is NEGATIVE. See the
+              warning at the end of this block: the multiply by x = 0
+              makes the product 0 in practice, so treat bitsTill = 0.
+              Conceptually it is right - the range [0, 0] holds no set
+              bits at all.
+
+      step 2  msbPart = 1 - 1 + 1 = 1
+              the single number 1 (0001) carries bit 0
+
+      step 3  rest = f(1 - 1) = f(0)
+
+    ----------------------------------------------------------------------
+    CALL f(0)
+      base case?   0 <= 0 ->  YES
+      RETURN 0                  the recursion bottoms out
+
+    ----------------------------------------------------------------------
+    Unwinding - each suspended call now adds its three parts
+
+      f(1)  =  bitsTill + msbPart + rest  =  0 +  1 + 0  =  1
+      f(3)  =  bitsTill + msbPart + rest  =  1 +  2 + 1  =  4
+      f(11) =  bitsTill + msbPart + rest  = 12 +  4 + 4  = 20
+
+    RETURN 20       main prints "Total set bits from 1 to 11: 20"
+                    and it matches the 1 + 1 + 2 + ... + 3 hand sum in
+                    the bit table above
+
+    ======================================================================
+    Summary table (the call stack for n = 11)
+    ======================================================================
+
+    | call  | n binary | x | 2^x | 2^x binary | bitsTill | msbPart | ret |
+    |-------|----------|---|-----|------------|----------|---------|-----|
+    | f(11) |   1011   | 3 |  8  |    1000    |    12    |    4    | 20  |
+    | f(3)  |   0011   | 1 |  2  |    0010    |     1    |    2    |  4  |
+    | f(1)  |   0001   | 0 |  1  |    0001    |     0    |    1    |  1  |
+    | f(0)  |   0000   | - |  -  |     -      |     -    |    -    |  0  |
+
+    The other two calls in main, for contrast:
+
+    | call  | n binary | x | 2^x | bitsTill      | msbPart    | ret |
+    |-------|----------|---|-----|---------------|------------|-----|
+    | f(4)  |  00100   | 2 |  4  | 2 * 2^1 =  4  | 4- 4+1 = 1 |   5 |
+    | f(0)  |  00000   | - |  -  |      -        |     -      |   0 |
+    | f(16) |  10000   | 4 | 16  | 4 * 2^3 = 32  | 16-16+1= 1 |  33 |
+    | f(0)  |  00000   | - |  -  |      -        |     -      |   0 |
+
+      f(4) = 4 + 1 + f(0) = 5      matches 1 + 1 + 2 + 1 from the Q block
+      f(16) = 32 + 1 + f(0) = 33   (32 set bits across 0..15, plus the
+                                    single bit 4 belonging to 16 itself)
+      Both are exact powers of two, so n - 2^x is 0 and the recursion
+      stops after ONE level - the cheapest possible shape for this code.
+
+    The bit-level identity that makes the trick work:
+      look at the numbers 0..7 written out in binary and count columns
+      instead of rows:
+
+          000   001   010   011   100   101   110   111
+          bit 2: 0 0 0 0 1 1 1 1   -> four 1s
+          bit 1: 0 0 1 1 0 0 1 1   -> four 1s
+          bit 0: 0 1 0 1 0 1 0 1   -> four 1s
+                                      total 12  = x * 2^(x-1), x = 3
+
+      Every column of a complete range [0, 2^x - 1] is a perfectly
+      balanced alternating pattern, so each of the x columns holds
+      2^(x-1) ones - no counting required. Above that range, the numbers
+      8..11 are just 0..3 with a 1000 glued on the front, which splits
+      their bits cleanly into "the glued MSB" (msbPart, 4 of them) and
+      "whatever 0..3 contribute" (the recursive call). Nothing is
+      double-counted because the MSB column and the lower columns are
+      disjoint.
+
+    Step count backing O(log n):
+      n = 11 (1011) needed 4 calls and 3 + 2 + 1 = 6 shift-loop tests -
+      about a dozen operations. The naive "count bits of every number
+      from 1 to 11" would run 11 iterations of a bit-counting loop, and
+      at n = 10^9 that becomes ~30 billion bit inspections versus at
+      most 30 calls here. Recursion depth equals the number of set bits
+      of n (each level clears exactly the highest remaining one), so the
+      O(log n) stack claim is tight: 1011 has three 1s -> three
+      non-base calls.
+
+    ----------------------------------------------------------------------
+    BUG SPOTTED (traced as-written above, not corrected):
+      when a call receives n == 1, findLargestPowerOf2 returns x = 0 and
+      the next line evaluates
+            x * (1 << (x - 1))   ->   0 * (1 << -1)
+      A shift by a negative count is UNDEFINED BEHAVIOUR in C++. In
+      practice the multiply by x = 0 discards whatever the shift
+      produced, so the answer still comes out right on ordinary
+      compilers - which is why n = 11 prints 20 above. But it is not
+      guaranteed, and it is reached by any input whose peeling chain
+      lands on 1 (n = 1, 3, 5, 11, ...). A guard such as
+            if (n == 1) return 1;
+      or computing bitsTill only when x > 0 removes the UB without
+      changing any result.
+
+      Secondary concern, same line: bitsTill is an int, and for large n
+      x * (1 << (x-1)) overflows - at n near INT_MAX, x = 30 gives
+      30 * 2^29 = 16106127360, far past the int range. The recursion is
+      correct in shape but needs a wider accumulator for big n.
+*/

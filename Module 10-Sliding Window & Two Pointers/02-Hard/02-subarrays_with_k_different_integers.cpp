@@ -10,10 +10,6 @@ using namespace std;
 //        {1,2}, {2,1}, {1,2}, {1,2,1}, {2,1,2}, {1,2,1,2}, {2,3}
 // nums = {1, 2, 1, 3, 4}, k = 3 -> 3
 //        {1,2,1,3}, {2,1,3}, {1,3,4}
-//
-// Note: this is an array problem rather than a string one - the same
-// solution also lives with the other window problems in
-// "Module 10-Sliding Window & Two Pointers/02-Hard".
 
 /*
     Approach: exactly(k) = atMost(k) - atMost(k - 1)

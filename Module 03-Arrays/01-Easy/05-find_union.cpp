@@ -107,3 +107,135 @@ int main() {
 
     return 0;
 }
+
+/*
+    ======================================================================
+    DRY RUN of findUnion (Approach 1)
+    a = {1, 2, 2, 3, 4},  b = {2, 3, 3, 5}
+    (n = 5, m = 4, answer = 1 2 3 4 5)
+    ======================================================================
+
+      index:   0   1   2   3   4
+      a:       1   2   2   3   4        <-- duplicate 2 at a[1], a[2]
+      b:       2   3   3   5            <-- duplicate 3 at b[1], b[2]
+
+    Tracked state:
+      i    - cursor into a
+      j    - cursor into b
+      res  - the output, built in sorted order, never repeating a value
+
+    Both duplicate-skipping while loops compare against the PREVIOUS
+    element (a[i] == a[i-1]) and are guarded by i > 0, so index 0 is
+    never skipped. Duplicates are therefore skipped lazily, at the top of
+    the iteration that would otherwise have consumed them.
+
+    Initial state: i = 0, j = 0, res = []
+
+    ----------------------------------------------------------------------
+    iteration 1     (i = 0, j = 0)
+      skip a?      i > 0 is false -> guard blocks it, no skipping
+      skip b?      j > 0 is false -> guard blocks it, no skipping
+      bounds       i = 0 < 5 and j = 0 < 4 -> no break
+      compare      a[0] = 1  vs  b[0] = 2   ->  a is smaller
+      push         res = [1]
+      advance      i -> 1,  j stays 0
+
+                      a:  1   2   2   3   4
+                              ^
+                              i=1
+                      b:  2   3   3   5
+                          ^
+                          j=0
+
+    ----------------------------------------------------------------------
+    iteration 2     (i = 1, j = 0)
+      skip a?      a[1] = 2 == a[0] = 1 ?  no  -> stay
+      skip b?      j > 0 is false          -> stay
+      compare      a[1] = 2  vs  b[0] = 2  ->  EQUAL (the tie branch)
+      push         push the value ONCE only, not twice
+                   res = [1, 2]
+      advance      BOTH cursors move: i -> 2, j -> 1
+                   (this is how a value present in both arrays still ends
+                    up in the union exactly once)
+
+    ----------------------------------------------------------------------
+    iteration 3     (i = 2, j = 1)      <-- duplicate skipping happens here
+      skip a       step 1: a[2] = 2 == a[1] = 2 ?  YES -> i -> 3
+                   step 2: a[3] = 3 == a[2] = 2 ?  no  -> stop, i = 3
+                   (the second 2 in a is discarded WITHOUT being pushed -
+                    the value 2 already reached res in iteration 2)
+      skip b       step 1: b[1] = 3 == b[0] = 2 ?  no  -> stop, j = 1
+      bounds       i = 3 < 5 and j = 1 < 4 -> no break
+      compare      a[3] = 3  vs  b[1] = 3  ->  EQUAL again
+      push         res = [1, 2, 3]
+      advance      i -> 4,  j -> 2
+
+    ----------------------------------------------------------------------
+    iteration 4     (i = 4, j = 2)      <-- now b has the duplicate
+      skip a       step 1: a[4] = 4 == a[3] = 3 ?  no  -> stop, i = 4
+      skip b       step 1: b[2] = 3 == b[1] = 3 ?  YES -> j -> 3
+                   step 2: b[3] = 5 == b[2] = 3 ?  no  -> stop, j = 3
+      bounds       i = 4 < 5 and j = 3 < 4 -> no break
+      compare      a[4] = 4  vs  b[3] = 5  ->  a is smaller
+      push         res = [1, 2, 3, 4]
+      advance      i -> 5,  j stays 3
+
+                      a:  1   2   2   3   4       (exhausted)
+                                              ^
+                                              i=5 == n
+                      b:  2   3   3   5
+                                      ^
+                                      j=3
+
+    ----------------------------------------------------------------------
+    main while test: i = 5 is NOT < n = 5  ->  merge loop ends
+                     (a is exhausted, b still has one element left)
+
+    ----------------------------------------------------------------------
+    TAIL 1 - drain remaining elements of a
+      test         i = 5 < 5 ?  no  ->  loop body never runs
+
+    ----------------------------------------------------------------------
+    TAIL 2 - drain remaining elements of b
+      j = 3        j == 0 ?  no.  b[3] = 5 != b[2] = 3 ?  yes -> push
+                   res = [1, 2, 3, 4, 5]
+                   j -> 4
+      test         j = 4 < 4 ?  no  ->  loop ends
+
+                   note the tail loops repeat the same "differs from the
+                   previous element" test, because a leftover run could
+                   itself contain duplicates (e.g. b ending 5 5 5 would
+                   push 5 just once).
+
+    ----------------------------------------------------------------------
+    RETURN res = 1 2 3 4 5
+
+    findUnionUsingSet on the same input inserts 1,2,2,3,4 then 2,3,3,5;
+    the set collapses to {1,2,3,4,5} and prints identically.
+
+    ======================================================================
+    Summary table
+    ======================================================================
+
+    | it | i,j in | a skips | b skips | i,j | a[i] vs b[j] | res        |
+    |----|--------|---------|---------|-----|--------------|------------|
+    | 1  | 0,0    |  0      |  0      | 0,0 | 1  <  2      | 1          |
+    | 2  | 1,0    |  0      |  0      | 1,0 | 2  == 2      | 1 2        |
+    | 3  | 2,1    |  1      |  0      | 3,1 | 3  == 3      | 1 2 3      |
+    | 4  | 4,2    |  0      |  1      | 4,3 | 4  <  5      | 1 2 3 4    |
+    | -  | tail a |  -      |  -      | 5,3 | a empty      | 1 2 3 4    |
+    | -  | tail b |  -      |  -      | 5,4 | push b[3]=5  | 1 2 3 4 5  |
+
+    Step count backing O(n + m): 4 merge iterations, 2 duplicate skips,
+    1 tail push. i moved 0->5 and j moved 0->4, monotonically, never
+    backwards - so 9 cursor steps for 9 input elements. Neither array is
+    ever rescanned, which is exactly what makes this linear where the
+    set-based version pays an extra log factor per insertion.
+
+    The subtlety to watch: the `if (i >= n || j >= m) break;` after the
+    skip loops. A skip loop can push a cursor to the very end of its
+    array, and without that break the code would immediately read a[i]
+    or b[j] one past the end. In this trace the check was reached three
+    times and never fired, but on input like a = {1, 1}, b = {2} the
+    a-skip would drive i to 2 == n and the break is what saves it.
+*/

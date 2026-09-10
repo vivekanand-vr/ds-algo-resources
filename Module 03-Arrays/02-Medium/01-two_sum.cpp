@@ -54,3 +54,70 @@ int main() {
 
     return 0;
 }
+
+/*
+    ==========================================================================
+    DRY RUN: arr = {2, 7, 11, 15}, k = 9   (n = 4, answer = {0, 1})
+    ==========================================================================
+
+      index:   0   1   2   3
+      value:   2   7  11  15
+
+    Tracked state:
+      mp   - value -> index, for every element ALREADY passed (left of i)
+      i    - index currently being examined
+      need - the complement k - arr[i]; the partner arr[i] is looking for
+
+    Initial state: i = 0, mp = {}   (nothing seen yet)
+
+    --------------------------------------------------------------------------
+    i = 0, arr[i] = 2
+      need         k - arr[i] = 9 - 2 = 7
+      lookup       mp.find(7) in mp = {}   -> end(), not present
+      store        mp[2] = 0               -> mp = {2:0}
+      advance      i -> 1
+
+    --------------------------------------------------------------------------
+    i = 1, arr[i] = 7
+      need         k - arr[i] = 9 - 7 = 2
+      lookup       mp.find(2) in mp = {2:0} -> FOUND, mp[2] = 0
+      return       { mp[2], i } = { 0, 1 }            <-- exits here
+
+                       2    7   11   15
+                       ^    ^
+                    stored  current
+                    idx 0   idx 1        2 + 7 = 9 = k
+
+    --------------------------------------------------------------------------
+    RETURN {0, 1}        arr[0] + arr[1] = 2 + 7 = 9
+
+    Indices 2 and 3 are never even read - the loop returns on the second
+    iteration.
+
+    ==========================================================================
+    Summary table
+    ==========================================================================
+
+    | i | arr[i] | need | in mp? | mp after step | action        |
+    |---|--------|------|--------|---------------|---------------|
+    | 0 |   2    |  7   | no     | {2:0}         | store 2 -> 0  |
+    | 1 |   7    |  2   | yes(0) | {2:0}         | return {0,1}  |
+
+    Why the lookup direction matters:
+      the map only ever holds elements to the LEFT of i, so the pair returned
+      is always {smaller index, larger index} and an element can never pair
+      with itself. Storing arr[i] AFTER the lookup is what guarantees that -
+      swapping those two lines would let arr[i] match itself whenever
+      2 * arr[i] == k (e.g. arr = {4, 4}, k = 8 would wrongly return {0, 0}).
+
+    Duplicate values:
+      mp[arr[i]] = i OVERWRITES an earlier index for the same value, so the
+      map keeps the RIGHTMOST occurrence seen so far. Harmless here, since a
+      match returns immediately, but it means a value's stored index is not
+      necessarily its first occurrence.
+
+    Step count backing O(n log n):
+      2 iterations, each doing one find and at most one insert. In the worst
+      case (no early hit) that is n finds + n inserts = 2n map operations,
+      each O(log n) on a std::map. An unordered_map would make it O(n).
+*/

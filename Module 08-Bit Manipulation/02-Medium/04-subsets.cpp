@@ -79,3 +79,85 @@ int main() {
 
   return 0;
 }
+
+/*
+    ======================================================================
+    DRY RUN: nums = {1, 2, 3}   (n = 3, answer = 8 subsets)
+    ======================================================================
+
+    The mask -> subset mapping is already tabulated at the top of this
+    file. What follows traces the LOOP instead: how the inner bit-test
+    actually builds one subset, and how result grows.
+
+      index i      :   0     1     2
+      nums[i]      :   1     2     3
+      test value   : 1<<0  1<<1  1<<2
+      binary       : 0001  0010  0100
+      bit position : bit2 bit1 bit0   (bit0 = LSB = nums[0])
+
+    Tracked state:
+      mask   - the outer counter, 0 .. (1<<3)-1 = 0..7; its bit i says
+               whether nums[i] joins this subset
+      subset - the vector being built for the current mask
+      result - all finished subsets so far
+
+    Initial state: mask = 0, result = [] (empty)
+
+    ----------------------------------------------------------------------
+    mask = 0   (binary 000)
+      step 1: i = 0   mask & (1<<0) = 000 & 001 = 000 -> 0, skip
+      step 2: i = 1   mask & (1<<1) = 000 & 010 = 000 -> 0, skip
+      step 3: i = 2   mask & (1<<2) = 000 & 100 = 000 -> 0, skip
+      subset  {}                        no bit set -> the empty subset
+      result  [ {} ]                    size 1
+
+    ----------------------------------------------------------------------
+    mask = 3   (binary 011)
+      step 1: i = 0   011 & 001 = 001 -> nonzero, push nums[0] = 1
+                      subset = {1}
+      step 2: i = 1   011 & 010 = 010 -> nonzero, push nums[1] = 2
+                      subset = {1, 2}
+      step 3: i = 2   011 & 100 = 000 -> 0, skip
+      subset  {1, 2}
+      result  [ {}, {1}, {2}, {1,2} ]   size 4
+
+    ----------------------------------------------------------------------
+    mask = 5   (binary 101)
+      step 1: i = 0   101 & 001 = 001 -> nonzero, push nums[0] = 1
+                      subset = {1}
+      step 2: i = 1   101 & 010 = 000 -> 0, skip   (2 stays out)
+      step 3: i = 2   101 & 100 = 100 -> nonzero, push nums[2] = 3
+                      subset = {1, 3}
+      subset  {1, 3}
+      result  [ {}, {1}, {2}, {1,2}, {3}, {1,3} ]   size 6
+
+    ----------------------------------------------------------------------
+    mask = 7   (binary 111)
+      all three tests nonzero -> subset = {1, 2, 3}
+      result  size 8, mask++ -> 8, and 8 < (1<<3) = 8 is false: loop ends
+
+    ----------------------------------------------------------------------
+    RETURN result, 8 subsets, in mask order:
+      {} {1} {2} {1,2} {3} {1,3} {2,3} {1,2,3}
+
+    ======================================================================
+    Summary table
+    ======================================================================
+
+    | mask | binary | i=0 test | i=1 test | i=2 test | subset  | result |
+    |------|--------|----------|----------|----------|---------|--------|
+    |  0   |  000   |   skip   |   skip   |   skip   | {}      |   1    |
+    |  1   |  001   |   push 1 |   skip   |   skip   | {1}     |   2    |
+    |  2   |  010   |   skip   |   push 2 |   skip   | {2}     |   3    |
+    |  3   |  011   |   push 1 |   push 2 |   skip   | {1,2}   |   4    |
+    |  4   |  100   |   skip   |   skip   |   push 3 | {3}     |   5    |
+    |  5   |  101   |   push 1 |   skip   |   push 3 | {1,3}   |   6    |
+    |  6   |  110   |   skip   |   push 2 |   push 3 | {2,3}   |   7    |
+    |  7   |  111   |   push 1 |   push 2 |   push 3 | {1,2,3} |   8    |
+
+    Step count backing O(n * 2^n):
+      8 masks x 3 bit tests = 24 bit tests, and 12 pushes in total (the
+      subset sizes 0+1+1+2+1+2+2+3 = 12 = n * 2^(n-1)). Nothing is
+      recomputed and nothing backtracks - the mask counter alone drives
+      the whole enumeration.
+*/

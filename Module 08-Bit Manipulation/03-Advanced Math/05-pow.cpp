@@ -76,3 +76,106 @@ int main() {
 
   return 0;
 }
+
+/*
+    ======================================================================
+    DRY RUN: x = 2.0, n = 10   (answer = 1024.0)
+    ======================================================================
+
+      the exponent being decomposed:
+        n = 10 = 1010 in binary
+        bit position : bit3 bit2 bit1 bit0
+        bit value    :  1    0    1    0
+        weight       :  8    4    2    1
+        so 10 = 8 + 2   and   2^10 = 2^8 * 2^2 = 256 * 4 = 1024
+
+      the loop consumes those bits from the RIGHT (bit0 first).
+
+    Tracked state:
+      N      - the remaining exponent; shifted right one bit per step,
+               so its lowest bit is the bit currently being examined
+      x      - the current repeated-squaring power: x^1, x^2, x^4, x^8...
+      result - the product of exactly those powers whose bit was set
+
+    Setup:
+      N = 10 (widened to long long), N < 0 is false -> no reciprocal,
+      no sign flip. result = 1.0, x = 2.0
+
+    Initial state: N = 1010 (10), x = 2.0, result = 1.0
+
+    ----------------------------------------------------------------------
+    step 1     N = 1010 (10),  x = 2.0 = x^1
+      bit set?   N & 1 = 1010 & 0001 = 0000 -> bit0 is 0, DO NOT multiply
+      result     stays 1.0
+      square     x = 2.0 * 2.0 = 4.0            (now x^2)
+      halve      N = 1010 >> 1 = 101 (5)
+
+    ----------------------------------------------------------------------
+    step 2     N = 101 (5),  x = 4.0 = x^2
+      bit set?   N & 1 = 101 & 001 = 001 -> bit is 1, MULTIPLY
+      result     1.0 * 4.0 = 4.0                (x^2 folded in)
+      square     x = 4.0 * 4.0 = 16.0           (now x^4)
+      halve      N = 101 >> 1 = 10 (2)
+
+    ----------------------------------------------------------------------
+    step 3     N = 10 (2),  x = 16.0 = x^4
+      bit set?   N & 1 = 10 & 01 = 0 -> bit is 0, DO NOT multiply
+      result     stays 4.0
+      square     x = 16.0 * 16.0 = 256.0        (now x^8)
+      halve      N = 10 >> 1 = 1
+
+    ----------------------------------------------------------------------
+    step 4     N = 1 (1),  x = 256.0 = x^8
+      bit set?   N & 1 = 1 -> MULTIPLY
+      result     4.0 * 256.0 = 1024.0           (x^8 folded in)
+      square     x = 256.0 * 256.0 = 65536.0    (x^16 - computed but
+                                                 never used; the code
+                                                 squares unconditionally
+                                                 even on the last pass)
+      halve      N = 1 >> 1 = 0  ->  while (N > 0) fails, loop ends
+
+    ----------------------------------------------------------------------
+    RETURN result = 1024.0
+
+    ======================================================================
+    Summary table
+    ======================================================================
+
+    x = 2.0, n = 10 (binary 1010):
+
+    | step | N before | N binary | bit set? | x in  | result after | N after |
+    |------|----------|----------|----------|-------|--------------|---------|
+    |  1   |    10    |   1010   |    no    |   2.0 |      1.0     |    5    |
+    |  2   |     5    |    101   |   yes    |   4.0 |      4.0     |    2    |
+    |  3   |     2    |     10   |    no    |  16.0 |      4.0     |    1    |
+    |  4   |     1    |      1   |   yes    | 256.0 |   1024.0     |    0    |
+
+      the two "yes" rows contributed x^2 and x^8, exactly the two set
+      bits of 1010, and 2 + 8 = 10.
+
+    The negative case from main(), x = 2.0, n = -2:
+      setup   N = -2 < 0 -> x = 1 / 2.0 = 0.5, N = 2 (binary 10)
+
+    | step | N before | N binary | bit set? | x in   | result after | N after |
+    |------|----------|----------|----------|--------|--------------|---------|
+    |  1   |     2    |     10   |    no    |  0.5   |     1.0      |    1    |
+    |  2   |     1    |      1   |   yes    | 0.25   |     0.25     |    0    |
+
+      RETURN 0.25 = 1/4 = 2^-2   (check)
+
+    The n = 0 case: N = 0, the while body never runs, result stays 1.0.
+
+    The identity that makes it work:
+      write n in binary as a sum of distinct powers of two,
+      n = 2^a1 + 2^a2 + ... ; then
+          x^n = x^(2^a1) * x^(2^a2) * ...
+      and the repeated squaring x -> x^2 -> x^4 -> x^8 walks through
+      every x^(2^k) in order, so one pass over the bits of n suffices.
+
+    Step count backing O(log n):
+      n = 10 needed 4 iterations - the number of bits in 1010 - with one
+      squaring and at most one extra multiply each, so 7 multiplications
+      total instead of the 10 a naive loop would use. The gap is the
+      whole point at scale: n = 1,000,000,000 takes 30 iterations
+      (about 59 multiplications) rather than a billion.
+*/

@@ -54,3 +54,72 @@ int main() {
 
   return 0;
 }
+
+/*
+    ==========================================================================
+    DRY RUN: num = "4206"   (n = 4, answer = "")
+    ==========================================================================
+
+      index:   0   1   2   3
+      digit:   4   2   0   6
+
+    Tracked state:
+      i - the scan position, walking from n - 1 down to 0; it is also the
+          last index of the prefix num[0..i] being considered
+
+    Initial state: i = 3
+
+    --------------------------------------------------------------------------
+    i = 3
+      read     num[3] = '6'
+      test     (6) % 2 == 0  -> even, this prefix "4206" is an even number
+      skip     i -> 2
+
+    --------------------------------------------------------------------------
+    i = 2
+      read     num[2] = '0'
+      test     (0) % 2 == 0  -> even, prefix "420" rejected
+      skip     i -> 1
+
+    --------------------------------------------------------------------------
+    i = 1
+      read     num[1] = '2'
+      test     (2) % 2 == 0  -> even, prefix "42" rejected
+      skip     i -> 0
+
+    --------------------------------------------------------------------------
+    i = 0
+      read     num[0] = '4'
+      test     (4) % 2 == 0  -> even, prefix "4" rejected
+      skip     i -> -1, the `i >= 0` condition fails, loop ends
+
+    --------------------------------------------------------------------------
+    RETURN ""        (no odd digit exists anywhere, so no odd prefix can)
+
+    ==========================================================================
+    Summary table
+    ==========================================================================
+
+    | i | num[i] | odd? | action                    |
+    |---|--------|------|---------------------------|
+    | 3 |   6    |  no  | keep scanning left        |
+    | 2 |   0    |  no  | keep scanning left        |
+    | 1 |   2    |  no  | keep scanning left        |
+    | 0 |   4    |  no  | loop exhausted -> return ""|
+
+    Contrast, on main()'s other inputs:
+      num = "35427" -> i = 4, num[4] = '7' is odd on the FIRST test, so it
+                       returns substr(0, 5) = "35427" after one step.
+      num = "52"    -> i = 1, '2' is even; i = 0, '5' is odd -> substr(0, 1)
+                       = "5" after two steps.
+
+    Step count behind the O(n) claim:
+      "4206" is the worst case - every digit is even, so all 4 indices are
+      examined once and nothing else happens. The first odd digit found ends
+      the function immediately, which is why "35427" costs a single step.
+
+    Why the FIRST odd digit from the right is the answer and not just an
+    answer: a longer prefix would have to end on one of the even digits we
+    already passed, which cannot be odd; and any shorter prefix is a number
+    with fewer digits, hence strictly smaller.
+*/

@@ -46,3 +46,49 @@ int main() {
 
     return 0;
 }
+
+/*
+    ======================================================================
+    DRY RUN: nums = {3, 0, 1}      (n = 3, answer = 2)
+    ======================================================================
+
+      index:   0   1   2
+      value:   3   0   1
+
+    The range is [0, n] = [0, 3], which is 4 candidate values for only
+    3 array slots - so exactly one of 0,1,2,3 is absent. Here it is 2.
+
+    Tracked state:
+      sum - starts as the total of 0..n, then has each present element
+            subtracted out. Whatever survives is the missing value.
+
+    Initial state: sum = n*(n+1)/2 = 3*4/2 = 6
+                   (that is 0+1+2+3 = 6, the total if nothing were missing)
+
+    ----------------------------------------------------------------------
+    i = 3    subtract   sum = 6 - 3 = 3
+    i = 0    subtract   sum = 3 - 0 = 3
+    i = 1    subtract   sum = 3 - 1 = 2
+    ----------------------------------------------------------------------
+    RETURN 2
+
+    ======================================================================
+    Summary table
+    ======================================================================
+
+    | element | sum before | sum after |
+    |---------|------------|-----------|
+    |    -    |     -      |     6     |
+    |    3    |     6      |     3     |
+    |    0    |     3      |     3     |
+    |    1    |     3      |     2     |
+
+    Why it works: sum(0..n) - sum(present) = sum(absent), and since the
+    problem guarantees the values are distinct and exactly one is absent,
+    that difference IS the missing number. Order does not matter - the
+    loop is a plain accumulation, so any permutation of {3,0,1} gives 2.
+
+    One pass, 3 subtractions plus one multiply - O(n) time, one int of
+    state, O(1) space. (The XOR variant avoids the n*(n+1)/2 product,
+    which can overflow int for very large n.)
+*/

@@ -72,3 +72,139 @@ int main() {
 
   return 0;
 }
+
+/*
+    ==========================================================================
+    DRY RUN: s = "(()())(())"   (n = 10, answer = "()()()")
+    ==========================================================================
+
+      index:   0   1   2   3   4   5   6   7   8   9
+      char:    (   (   )   (   )   )   (   (   )   )
+      block:   |<---- primitive 1 ----->|<- primitive 2 ->|
+
+    Tracked state:
+      balance - number of '(' currently unmatched (the nesting depth)
+      res     - the output string, built one character at a time
+
+    The rule the code applies:
+      on '('  -> append it ONLY if balance was already > 0, then balance++
+      on ')'  -> balance-- FIRST, then append it only if balance is still > 0
+
+    Why that drops exactly the outermost pair of each primitive block:
+      the '(' that opens a block is the one seen while balance == 0, and
+      the ')' that closes it is the one that drives balance back to 0.
+      Both tests fail on those two characters and on no others.
+
+    Initial state: balance = 0, res = ""
+
+    --------------------------------------------------------------------------
+    i = 0, c = '('          <-- OPENS primitive block 1
+      read     '('
+      test     balance = 0, not > 0   -> do NOT append (this is outermost)
+      open     balance 0 -> 1
+      res      ""            (unchanged)
+
+    --------------------------------------------------------------------------
+    i = 1, c = '('
+      read     '('
+      test     balance = 1 > 0        -> append (inner paren)
+      append   res -> "("
+      open     balance 1 -> 2
+
+    --------------------------------------------------------------------------
+    i = 2, c = ')'
+      read     ')'
+      close    balance 2 -> 1
+      test     balance = 1 > 0        -> append (inner paren)
+      append   res -> "()"
+
+    --------------------------------------------------------------------------
+    i = 3, c = '('
+      read     '('
+      test     balance = 1 > 0        -> append
+      append   res -> "()("
+      open     balance 1 -> 2
+
+    --------------------------------------------------------------------------
+    i = 4, c = ')'
+      read     ')'
+      close    balance 2 -> 1
+      test     balance = 1 > 0        -> append
+      append   res -> "()()"
+
+    --------------------------------------------------------------------------
+    i = 5, c = ')'          <-- CLOSES primitive block 1
+      read     ')'
+      close    balance 1 -> 0
+      test     balance = 0, not > 0   -> do NOT append (this is outermost)
+      skip     res -> "()()"          (unchanged)
+
+               (   (   )   (   )   )   (   (   )   )
+               ^                   ^
+               |                   |
+               dropped at i = 0    dropped here at i = 5
+               (balance was 0)     (balance fell back to 0)
+
+               everything strictly between them survived: "()()"
+
+    --------------------------------------------------------------------------
+    i = 6, c = '('          <-- OPENS primitive block 2
+      read     '('
+      test     balance = 0, not > 0   -> do NOT append
+      open     balance 0 -> 1
+      res      "()()"        (unchanged)
+
+    --------------------------------------------------------------------------
+    i = 7, c = '('
+      read     '('
+      test     balance = 1 > 0        -> append
+      append   res -> "()()("
+      open     balance 1 -> 2
+
+    --------------------------------------------------------------------------
+    i = 8, c = ')'
+      read     ')'
+      close    balance 2 -> 1
+      test     balance = 1 > 0        -> append
+      append   res -> "()()()"
+
+    --------------------------------------------------------------------------
+    i = 9, c = ')'          <-- CLOSES primitive block 2
+      read     ')'
+      close    balance 1 -> 0
+      test     balance = 0, not > 0   -> do NOT append
+      skip     res -> "()()()"        (unchanged), loop ends
+
+    --------------------------------------------------------------------------
+    RETURN res = "()()()"
+
+    ==========================================================================
+    Summary table
+    ==========================================================================
+
+    | i | c | balance before | balance after | kept? | res      |
+    |---|---|----------------|---------------|-------|----------|
+    | 0 | ( |       0        |       1       |  no   | ""       |
+    | 1 | ( |       1        |       2       |  yes  | "("      |
+    | 2 | ) |       2        |       1       |  yes  | "()"     |
+    | 3 | ( |       1        |       2       |  yes  | "()("    |
+    | 4 | ) |       2        |       1       |  yes  | "()()"   |
+    | 5 | ) |       1        |       0       |  no   | "()()"   |
+    | 6 | ( |       0        |       1       |  no   | "()()"   |
+    | 7 | ( |       1        |       2       |  yes  | "()()("  |
+    | 8 | ) |       2        |       1       |  yes  | "()()()" |
+    | 9 | ) |       1        |       0       |  no   | "()()()" |
+
+    Step count behind the O(n) claim:
+      10 characters, 10 loop iterations, and a constant amount of work in
+      each (one comparison, one increment/decrement, at most one push_back).
+      No rescanning and no stack - the single integer `balance` carries all
+      the nesting information a stack would have held.
+
+    The subtlety to watch:
+      the two branches are NOT symmetric. For '(' the test comes BEFORE the
+      increment; for ')' it comes AFTER the decrement. Both branches are
+      really asking the same question - "is the depth outside this character
+      zero?" - and getting the order wrong on either one would drop the
+      inner parens instead of the outer ones.
+*/

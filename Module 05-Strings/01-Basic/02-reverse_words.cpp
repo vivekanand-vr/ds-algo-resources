@@ -88,3 +88,113 @@ int main() {
 
   return 0;
 }
+
+/*
+    ==========================================================================
+    DRY RUN: s = "  hello world!  "   (n = 16, answer = "world! hello")
+    ==========================================================================
+
+      index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15
+      char:   _  _  h  e  l  l  o  _  w  o  r  l  d  !  _  _
+
+      ( `_` marks an actual space character in s )
+
+    Tracked state:
+      i         - the RIGHT end of the word currently being cut out; the
+                  scan runs right-to-left, so i starts at n - 1 and only
+                  ever decreases
+      j         - walks left from i to just BEFORE the word, so after the
+                  inner loop the word is exactly s[j+1 .. i], length i - j
+      res       - the answer being built; because we meet the words in
+                  reverse order already, each word is APPENDED, never
+                  prepended
+      firstWord - true until the first word has been placed, so the space
+                  separator is written before every word except that one
+
+    Initial state: i = 15, res = "", firstWord = true
+
+    --------------------------------------------------------------------------
+    Outer pass 1:  i = 15
+      skip spaces  (inner while: i-- while s[i] == ' ')
+        step 1: s[15] = ' '  -> i -> 14
+        step 2: s[14] = ' '  -> i -> 13
+        step 3: s[13] = '!'  -> not a space, stop
+      guard        i = 13 >= 0, so a word does exist -> no break
+      find word    j = i = 13, then j-- while s[j] != ' '
+        step 1: s[13] = '!' -> j -> 12
+        step 2: s[12] = 'd' -> j -> 11
+        step 3: s[11] = 'l' -> j -> 10
+        step 4: s[10] = 'r' -> j ->  9
+        step 5: s[ 9] = 'o' -> j ->  8
+        step 6: s[ 8] = 'w' -> j ->  7
+        step 7: s[ 7] = ' ' -> a space, stop.  j = 7
+
+                   _  _  h  e  l  l  o  _  w  o  r  l  d  !  _  _
+                                        ^              ^
+                                        j+1            i
+                                        |<-- word -->|
+                   substr(j+1, i-j) = substr(8, 6) = "world!"
+
+      separator    firstWord is true -> no space written
+      append       res -> "world!"
+      mark         firstWord = false
+      hand off     i = j = 7
+
+    --------------------------------------------------------------------------
+    Outer pass 2:  i = 7
+      skip spaces
+        step 1: s[7] = ' '  -> i -> 6
+        step 2: s[6] = 'o'  -> not a space, stop
+      guard        i = 6 >= 0 -> no break
+      find word    j = 6, then j-- while s[j] != ' '
+        step 1: s[6] = 'o' -> j -> 5
+        step 2: s[5] = 'l' -> j -> 4
+        step 3: s[4] = 'l' -> j -> 3
+        step 4: s[3] = 'e' -> j -> 2
+        step 5: s[2] = 'h' -> j -> 1
+        step 6: s[1] = ' ' -> a space, stop.  j = 1
+                   substr(j+1, i-j) = substr(2, 5) = "hello"
+      separator    firstWord is false -> res -> "world! "
+      append       res -> "world! hello"
+      hand off     i = j = 1
+
+    --------------------------------------------------------------------------
+    Outer pass 3:  i = 1
+      skip spaces
+        step 1: s[1] = ' '  -> i ->  0
+        step 2: s[0] = ' '  -> i -> -1
+        step 3: i = -1, the `i >= 0` half of the condition fails, stop
+      guard        i < 0  -> BREAK out of the outer loop
+                   (this is the leading whitespace being consumed and
+                    correctly producing no word at all)
+
+    --------------------------------------------------------------------------
+    RETURN res = "world! hello"       (no leading or trailing space)
+
+    ==========================================================================
+    Summary table
+    ==========================================================================
+
+    | pass | i at entry | i after skip | j  | word     | res            |
+    |------|------------|--------------|----|----------|----------------|
+    |  1   |     15     |      13      |  7 | "world!" | "world!"       |
+    |  2   |      7     |       6      |  1 | "hello"  | "world! hello" |
+    |  3   |      1     |      -1      |  - | (none)   | "world! hello" |
+
+    Step count behind the O(n) claim:
+      the space-skipping loop ran 3 + 2 + 3 = 8 times and the word-walking
+      loop 7 + 6 = 13 times, so 21 index moves for a 16-character string.
+      i never increases, and j is always handed straight back into i, so
+      together they sweep the string once - the nesting does not multiply.
+
+    The two subtleties a reader trips on:
+      1. The separator is written BEFORE each word rather than after. Writing
+         it after would leave a trailing space here, because after "hello"
+         the only thing left to the left is the leading "  ", which yields no
+         further word - and by then the stray space is already in res.
+      2. `i = j` (not `j - 1`) at the end of a pass is deliberate. s[j] is
+         the space that stopped the walk, and the next pass begins with the
+         space-skipping loop, which handles it. That is also what makes the
+         run of spaces inside "a good   example" collapse to one separator
+         with no special case for it.
+*/

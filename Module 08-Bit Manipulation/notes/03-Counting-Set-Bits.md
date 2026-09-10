@@ -143,13 +143,13 @@ int findLargestPowerOf2(int n) {
     return x;
 }
 
-int countSetBitsIn1ToN(int n) {
+long long countSetBitsIn1ToN(int n) {
     if (n <= 0) return 0;
 
     int x = findLargestPowerOf2(n);
-    int bitsTill2x   = x * (1 << (x - 1));
-    int msbFrom2xToN = n - (1 << x) + 1;
-    int rest         = countSetBitsIn1ToN(n - (1 << x));
+    long long bitsTill2x   = (x > 0) ? ((long long)x * (1LL << (x - 1))) : 0LL;
+    long long msbFrom2xToN = (long long)n - (1LL << x) + 1;
+    long long rest         = countSetBitsIn1ToN(n - (1 << x));
 
     return bitsTill2x + msbFrom2xToN + rest;
 }

@@ -50,7 +50,7 @@ using namespace std;
     1. Base case: If n <= 0, return 0.
     2. Find x such that 2^x <= n (largest power of 2 <= n).
     3. Calculate:
-         a. bitsTill2x = x * 2^(x - 1)
+         a. bitsTill2x = (x > 0) ? x * 2^(x - 1) : 0
          b. msbFrom2xToN = n - 2^x + 1
          c. rest = countSetBitsIn1ToN(n - 2^x)
     4. Return bitsTill2x + msbFrom2xToN + rest
@@ -68,21 +68,28 @@ int findLargestPowerOf2(int n) {
   return x;
 }
 
-int countSetBitsIn1ToN(int n) {
+long long countSetBitsIn1ToN(int n) {
   if (n <= 0) return 0;
 
   int x = findLargestPowerOf2(n);
 
-  int bitsTillHighestPower = x * (1 << (x - 1));          // x * (2^(x-1))
-  int msbFromHighestPowerToN = n - (1 << x) + 1;          // n = 2^x + 1
-  int remainingBits = countSetBitsIn1ToN(n - (1 << x));   // n - 2^x
+  // Guard (x > 0) prevents (1 << -1) undefined behavior when x = 0 (n = 1).
+  // 1LL shift and long long avoid integer overflow for large n (e.g. n = 10^9).
+  long long bitsTillHighestPower = (x > 0) ? ((long long)x * (1LL << (x - 1))) : 0LL;
+  long long msbFromHighestPowerToN = (long long)n - (1LL << x) + 1;
+  long long remainingBits = countSetBitsIn1ToN(n - (1 << x));
 
   return bitsTillHighestPower + msbFromHighestPowerToN + remainingBits;
 }
 
 int main() {
-  int n = 4;
+  int n = 1;
   cout << "n = " << n << endl;
+  cout << "Total set bits from 1 to " << n << ": " << countSetBitsIn1ToN(n)
+       << endl;
+
+  n = 4;
+  cout << "\nn = " << n << endl;
   cout << "Total set bits from 1 to " << n << ": " << countSetBitsIn1ToN(n)
        << endl;
 
@@ -92,6 +99,11 @@ int main() {
        << endl;
 
   n = 16;
+  cout << "\nn = " << n << endl;
+  cout << "Total set bits from 1 to " << n << ": " << countSetBitsIn1ToN(n)
+       << endl;
+
+  n = 1000000000;
   cout << "\nn = " << n << endl;
   cout << "Total set bits from 1 to " << n << ": " << countSetBitsIn1ToN(n)
        << endl;
@@ -206,10 +218,10 @@ int main() {
         x = 0:   n >> 1  =  0 0 0 0   ( 0) not > 0  -> stop immediately
         returns x = 0            (2^0 = 1 <= 1 < 2)
 
-      step 1  bitsTill = x * (1 << (x-1)) = 0 * (1 << -1)
-              x is 0 here, so the shift count is NEGATIVE. See the
-              warning at the end of this block: the multiply by x = 0
-              makes the product 0 in practice, so treat bitsTill = 0.
+      step 1  bitsTill = (x > 0) ? x * (1LL << (x - 1)) : 0 = 0
+              x is 0 here, so the condition (x > 0) evaluates to false,
+              avoiding a negative shift count (1 << -1) which is Undefined
+              Behavior in C++.
               Conceptually it is right - the range [0, 0] holds no set
               bits at all.
 
@@ -288,24 +300,4 @@ int main() {
       of n (each level clears exactly the highest remaining one), so the
       O(log n) stack claim is tight: 1011 has three 1s -> three
       non-base calls.
-
-    ----------------------------------------------------------------------
-    BUG SPOTTED (traced as-written above, not corrected):
-      when a call receives n == 1, findLargestPowerOf2 returns x = 0 and
-      the next line evaluates
-            x * (1 << (x - 1))   ->   0 * (1 << -1)
-      A shift by a negative count is UNDEFINED BEHAVIOUR in C++. In
-      practice the multiply by x = 0 discards whatever the shift
-      produced, so the answer still comes out right on ordinary
-      compilers - which is why n = 11 prints 20 above. But it is not
-      guaranteed, and it is reached by any input whose peeling chain
-      lands on 1 (n = 1, 3, 5, 11, ...). A guard such as
-            if (n == 1) return 1;
-      or computing bitsTill only when x > 0 removes the UB without
-      changing any result.
-
-      Secondary concern, same line: bitsTill is an int, and for large n
-      x * (1 << (x-1)) overflows - at n near INT_MAX, x = 30 gives
-      30 * 2^29 = 16106127360, far past the int range. The recursion is
-      correct in shape but needs a wider accumulator for big n.
 */

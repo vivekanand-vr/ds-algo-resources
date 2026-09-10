@@ -56,3 +56,86 @@ int main() {
 
     return 0;
 }
+
+/*
+    ======================================================================
+    DRY RUN: arr = {8, 8, 7, 6, 5}      (n = 5, answer = 7)
+    ======================================================================
+
+      index:   0   1   2   3   4
+      value:   8   8   7   6   5
+
+    This input is chosen because the largest value is DUPLICATED. The
+    second largest is 7, not 8 - the duplicate must not be allowed to
+    slide into sec.
+
+    Tracked state:
+      mx  - largest value seen so far
+      sec - largest value seen so far that is strictly less than mx
+      INT_MIN is used as "nothing seen yet"
+
+    Initial state: mx = INT_MIN, sec = INT_MIN
+
+    ----------------------------------------------------------------------
+    i = 0, arr[i] = 8
+      branch 1?    8 > mx (INT_MIN) ?  YES
+      shift        sec = mx    -> sec = INT_MIN   (old mx demoted)
+      promote      mx  = 8     -> mx  = 8
+
+    ----------------------------------------------------------------------
+    i = 1, arr[i] = 8      <-- the tricky one: a repeat of the maximum
+      branch 1?    8 > mx (8) ?  no, it is EQUAL, not greater
+      branch 2?    8 > sec (INT_MIN) ?  yes, but
+                   8 != mx (8) ?        NO  -> whole condition false
+      keep         nothing changes: mx = 8, sec = INT_MIN
+
+                   the arr[i] != mx guard is what saves us here. Without
+                   it, branch 2 would have set sec = 8 and the function
+                   would wrongly answer 8.
+
+    ----------------------------------------------------------------------
+    i = 2, arr[i] = 7
+      branch 1?    7 > mx (8) ?  no
+      branch 2?    7 > sec (INT_MIN) ?  yes,  and  7 != mx (8) ?  yes
+      write        sec = 7                              <-- the answer
+      state        mx = 8, sec = 7
+
+    ----------------------------------------------------------------------
+    i = 3, arr[i] = 6
+      branch 1?    6 > mx (8) ?   no
+      branch 2?    6 > sec (7) ?  no
+      skip         mx = 8, sec = 7
+
+    ----------------------------------------------------------------------
+    i = 4, arr[i] = 5
+      branch 1?    5 > mx (8) ?   no
+      branch 2?    5 > sec (7) ?  no
+      skip         mx = 8, sec = 7
+
+    ----------------------------------------------------------------------
+    Post-loop:   sec = 7, which is not INT_MIN -> no -1 fallback
+    RETURN 7
+
+    ======================================================================
+    Summary table
+    ======================================================================
+
+    | i | arr[i] | 1: > mx? | 2: > sec && != mx? | mx | sec     |
+    |---|--------|----------|--------------------|----|---------|
+    | - |   -    |    -     |         -          | MIN|  MIN    |
+    | 0 |   8    |  yes     |    (not reached)   |  8 |  MIN    |
+    | 1 |   8    |  no      |  no (== mx)        |  8 |  MIN    |
+    | 2 |   7    |  no      |  yes               |  8 |   7     |
+    | 3 |   6    |  no      |  no                |  8 |   7     |
+    | 4 |   5    |  no      |  no                |  8 |   7     |
+
+    (MIN = INT_MIN)
+
+    Invariant that makes it correct: after processing index i, mx is the
+    maximum of arr[0..i] and sec is the maximum of the values in arr[0..i]
+    that are strictly smaller than mx. One pass, 5 iterations, at most two
+    comparisons each - O(n) time, two ints of state, O(1) space.
+
+    The -1 fallback fires only when sec never moved off INT_MIN, e.g.
+    arr = {8, 8, 8} (every element equals mx) or a single-element array.
+*/

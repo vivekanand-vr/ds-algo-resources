@@ -2,7 +2,7 @@
 
 Welcome to the **DSA Repository**! This repository contains a comprehensive collection of Data Structures and Algorithms (DSA) resources, including code implementations, categorized modules, and related notes. The goal is to help you learn and practice DSA concepts effectively.
 
-Every solved problem follows the same format: a **Q:** header describing the problem, a worked **Example**, an **Approach** block explaining the reasoning (not just the steps), numbered **Algorithm Steps**, stated **Time/Space Complexity**, and a `main()` that demonstrates the function on sample input. Where a module covers recurring techniques across multiple problems (currently Arrays, Bit Manipulation, and Sliding Window & Two Pointers), a `notes/` folder inside it collects the theory in one place.
+Every solved problem follows the same format, described in [Problem File Format](#problem-file-format) below. Where a module covers recurring techniques across multiple problems (currently Arrays, Bit Manipulation, and Sliding Window & Two Pointers), a `notes/` folder inside it collects the theory in one place.
 
 ### Repository Structure
 
@@ -19,6 +19,85 @@ Every solved problem follows the same format: a **Q:** header describing the pro
 | [C++ Data Structures](C%2B%2B%20Data%20Structures/)                 | Language-level container references (not module-based) | 3-part reference                     | `std::vector`, `std::string`, `std::map`/`unordered_map`/`set` — member functions, STL algorithms, complexities, pitfalls |
 
 > Module numbers 06–07 and 09 are reserved for upcoming topics (likely Linked Lists, Stacks/Queues, and Recursion/Backtracking) and are not yet populated.
+
+### Problem File Format
+
+Every problem file is self-contained and laid out in the same seven parts, so any file can be read top to bottom without cross-referencing anything else:
+
+| # | Part | What it holds |
+| --- | --- | --- |
+| 1 | Includes | `#include <bits/stdc++.h>` and `using namespace std;` |
+| 2 | `// Q:` | the problem statement, in full |
+| 3 | `// Example:` | one or more worked input → output pairs |
+| 4 | `/* Approach */` | **why** the algorithm works — the insight, the invariant, and what the naive attempt gets wrong |
+| 5 | `Algorithm Steps` | the same approach as numbered, implementable steps |
+| 6 | `Time / Space Complexity` | stated explicitly, with the reasoning for the bound |
+| 7 | The solution | the function itself, with sparse inline comments on the non-obvious lines |
+| 8 | `main()` | runs the examples so the file compiles and demonstrates itself |
+| 9 | `/* DRY RUN */` | a full iteration-by-iteration trace of one concrete input |
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+// Q: <the problem statement>
+//
+// Example:
+// <input> -> <output>
+
+/*
+    Approach: <name of the technique>
+
+    - <why this works; the key insight, not a restatement of the code>
+
+    Algorithm Steps
+    ----------------
+    1. <step>
+    2. <step>
+
+    Time Complexity: O(...) - <why>
+    Space Complexity: O(...) - <why>
+*/
+returnType solutionName(args) {
+    // <inline comments only where the WHY is non-obvious>
+}
+
+int main() {
+    // runs the examples from the header
+}
+
+/*
+    ==========================================================================
+    DRY RUN: <input>   (n = ..., answer = ...)
+    ==========================================================================
+
+      index:   0   1   2
+      value:   a   b   c
+
+    Tracked state:
+      <var> - <what it means>
+
+    Initial state: ...
+
+    --------------------------------------------------------------------------
+    <iteration 1>
+      <verb>      <what changed>   -> <new state>
+    --------------------------------------------------------------------------
+    <iteration 2>
+      ...
+
+    RETURN <value>
+
+    Summary table
+    | i | ... | ... |
+    |---|-----|-----|
+
+    <closing note: the step count behind the complexity claim, the invariant
+     that makes it correct, or the one subtlety a reader would trip on>
+*/
+```
+
+The **dry run** is the part that makes these files worth re-reading: it walks a single concrete input through the algorithm one iteration at a time, showing how every pointer, counter, map and array cell changes — including the inner-loop steps that are easy to get wrong. Where an algorithm has a non-obvious mechanism (a window shrinking by more than one position, a pointer that deliberately does not advance, a bitmask enumeration), the trace breaks that moment out step by step.
 
 ### How to Use
 

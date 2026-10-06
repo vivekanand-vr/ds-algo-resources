@@ -402,6 +402,8 @@ Space: `O(n)`, with two pointers of overhead per element.
 | Problem | Operation | Key detail |
 | --- | --- | --- |
 | [01 Insert at position](../02-Doubly%20Linked%20List/01-insert_at_position.cpp) | walk p steps + insert after (§5.3–5.4) | four-pointer rewire, `succ->prev` skipped at the tail |
+| [02 Delete at position](../02-Doubly%20Linked%20List/02-delete_node_in_dll.cpp) | delete head (§6.2) / unlink after node k-1 (§6.1) | new head's `prev` reset; `next->prev` skipped at the tail |
+| [03 Reverse a DLL](../02-Doubly%20Linked%20List/03-reverse_a_dll.cpp) | swap `prev`/`next` in every node (§7) | advance with `curr->prev` after the swap |
 
 For the singly linked foundations (traversal shapes, dummy node, basic insert/delete), see [Singly Linked List](01-Singly-Linked-List.md).
 

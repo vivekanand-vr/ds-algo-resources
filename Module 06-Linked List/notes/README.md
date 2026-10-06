@@ -6,6 +6,7 @@ Theory notes for the problems in [Module 06-Linked List](../). Each note gives t
 | --- | --- | --- |
 | 01 | [Singly Linked List](01-Singly-Linked-List.md) | node layout, array vs list, the traversal loop shapes, insert/delete at every position, dummy node, recursion, reverse, fast & slow pointers |
 | 02 | [Doubly Linked List](02-Doubly-Linked-List.md) | the `prev` invariant, four-pointer insert, `O(1)` unlink, reversal by swapping links, sentinel head/tail, LRU-style use |
+| 03 | [Tortoise and Hare](03-Tortoise-and-Hare.md) | slow & fast pointers, first vs second middle, Floyd's cycle detection and its proof, cycle start and length, k-th from end, use on arrays and number sequences |
 
 ---
 
@@ -28,6 +29,21 @@ Need to insert / delete at or before a node?
 
 Need to remove nodes you hold pointers to, or work at both ends?
                                              -> doubly linked list        [02 §3]
+
+Reverse the list?
++-- singly linked                            -> prev / curr / next        [01 §11.1]
++-- doubly linked                            -> swap prev and next        [02 §7]
+
+Need a RELATIVE position (middle, k-th from end) in one pass?
++-- middle                                   -> slow +1, fast +2          [03 §3]
+|     +-- second middle                      -> while (fast && fast->next)
+|     +-- first middle / split in halves     -> while (fast->next && fast->next->next)
++-- k-th from end                            -> same speed, head start k  [03 §8]
+
+Might the list loop forever?
++-- is there a cycle?                        -> Floyd: meet => cycle      [03 §4]
++-- where does it start?                     -> reset one to head, +1 each [03 §6]
++-- how long is it?                          -> walk once from the meeting point [03 §7]
 ```
 
 ---
@@ -48,3 +64,11 @@ Need to remove nodes you hold pointers to, or work at both ends?
 | Problem | Technique |
 | --- | --- |
 | [01 Insert at position](../02-Doubly%20Linked%20List/01-insert_at_position.cpp) | Walk p steps + four-pointer rewire — [Doubly](02-Doubly-Linked-List.md) §5.3–5.4 |
+| [02 Delete at position](../02-Doubly%20Linked%20List/02-delete_node_in_dll.cpp) | Stop on node k-1, unlink both directions — [Doubly](02-Doubly-Linked-List.md) §6 |
+| [03 Reverse a DLL](../02-Doubly%20Linked%20List/03-reverse_a_dll.cpp) | Swap `next`/`prev` in every node — [Doubly](02-Doubly-Linked-List.md) §7 |
+
+### 03-Medium Linked List
+
+| Problem | Technique |
+| --- | --- |
+| [01 Middle of linked list](../03-Medium%20Linked%20List/01-middle_of_linked_list.cpp) | Tortoise and hare, first middle + correction — [Tortoise and Hare](03-Tortoise-and-Hare.md) §2, §3.2 |

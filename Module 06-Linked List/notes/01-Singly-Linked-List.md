@@ -469,9 +469,11 @@ Node* middle(Node* head) {
 }
 ```
 
-When `fast` reaches the end, `slow` has gone half as far. Same idea as the fast/slow pointers in [Two Pointers](../../Module%2003-Arrays/notes/04-Two-Pointers.md), but on a list.
+When `fast` reaches the end, `slow` has gone half as far. Same idea as the fast/slow pointers in [Two Pointers](../../Module%2003-Arrays/notes/04-Two-Pointers.md), but on a list. Both loop conditions, the first vs second middle and the proofs are in [Tortoise and Hare](03-Tortoise-and-Hare.md).
 
 ### 11.3 Floyd's cycle detection
+
+Why the pointers must meet, and how to find where the cycle starts: [Tortoise and Hare](03-Tortoise-and-Hare.md) §4–§6.
 
 ```cpp
 bool hasCycle(Node* head) {
